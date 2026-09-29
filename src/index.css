@@ -1,0 +1,121 @@
+@import 'tailwindcss';
+
+/* ---- Дизайн-токены, снятые с макета Figma (FoodCrafter, ширина 402px) ---- */
+:root {
+  --fc-accent: #0076fd;
+  --fc-accent-press: #0062d6;
+  --fc-danger: #f22f2f;
+
+  --fc-bg: #f2f2f2;
+  --fc-surface: #ffffff;
+  --fc-muted: #ededed;
+  --fc-placeholder: #dddddd;
+  --fc-photo-fallback: #a8a8a8;
+
+  --fc-text: #000000;
+  --fc-text-2: #8e8e93;
+  --fc-line: #d9d9d9;
+
+  --fc-tabbar: #737373;
+  --fc-tabbar-item: rgba(255, 255, 255, 0.12);
+
+  --fc-r-card: 28px;
+  --fc-r-dashed: 25px;
+  --fc-r-tile: 16px;
+  --fc-r-sheet: 24px;
+
+  color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --fc-bg: #000000;
+  --fc-surface: #1c1c1e;
+  --fc-muted: #2c2c2e;
+  --fc-placeholder: #3a3a3c;
+  --fc-photo-fallback: #48484a;
+
+  --fc-text: #ffffff;
+  --fc-text-2: #98989f;
+  --fc-line: #38383a;
+
+  --fc-tabbar: #3a3a3c;
+  --fc-tabbar-item: rgba(255, 255, 255, 0.08);
+
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-accent: var(--fc-accent);
+  --color-danger: var(--fc-danger);
+  --color-bg: var(--fc-bg);
+  --color-surface: var(--fc-surface);
+  --color-muted: var(--fc-muted);
+  --color-placeholder: var(--fc-placeholder);
+  --color-ink: var(--fc-text);
+  --color-ink2: var(--fc-text-2);
+  --color-line: var(--fc-line);
+  --color-tabbar: var(--fc-tabbar);
+
+  --radius-card: var(--fc-r-card);
+  --radius-dashed: var(--fc-r-dashed);
+  --radius-tile: var(--fc-r-tile);
+  --radius-sheet: var(--fc-r-sheet);
+
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI', system-ui,
+    sans-serif;
+}
+
+/* Всё, что ниже, живёт в слое base: иначе оно перебивает утилиты Tailwind. */
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--fc-bg);
+    color: var(--fc-text);
+    font-family: var(--font-sans);
+    font-size: 15px;
+    -webkit-font-smoothing: antialiased;
+    overscroll-behavior-y: none;
+  }
+
+  button,
+  input,
+  textarea,
+  select {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  /* Видимый фокус только с клавиатуры */
+  :focus-visible {
+    outline: 3px solid var(--fc-accent);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
