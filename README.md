@@ -4,7 +4,7 @@
 ингредиентов, КБЖУ считается автоматически, а все продукты за выбранный период складываются
 в список покупок.
 
-**Сайт:** https://REPLACE_OWNER.github.io/foodcrafter/
+**Сайт:** https://sonofvibedev.github.io/FoodCrafter/
 
 Приложение открывается по ссылке и работает без регистрации: данные лежат в `localStorage`
 браузера. При первом запуске показываются демо-данные — 12 ингредиентов, 5 блюд и заполненный
@@ -55,13 +55,13 @@ React Router (HashRouter) · lucide-react · vite-plugin-pwa · Vitest.
 
 ```bash
 npm install
-npm run dev      # http://localhost:5173/foodcrafter/
+npm run dev      # http://localhost:5173/FoodCrafter/
 npm run test     # unit-тесты расчётов
 npm run build    # сборка в dist/
 npm run preview  # посмотреть собранную версию
 ```
 
-Базовый путь по умолчанию — `/foodcrafter/` (так требуется для GitHub Pages).
+Базовый путь по умолчанию — `/FoodCrafter/` (так требуется для GitHub Pages).
 Для сборки под другой адрес задайте переменную окружения:
 
 ```bash

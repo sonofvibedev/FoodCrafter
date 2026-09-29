@@ -4,7 +4,7 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 // На GitHub Pages сайт живёт в подпапке репозитория.
-const base = process.env.VITE_BASE ?? '/foodcrafter/'
+const base = process.env.VITE_BASE ?? '/FoodCrafter/'
 
 export default defineConfig({
   base,
