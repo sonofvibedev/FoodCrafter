@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import BottomSheet from '../components/BottomSheet'
 import CategoryFilter from '../components/CategoryFilter'
-import DashedAddCard from '../components/DashedAddCard'
+import AddCard from '../components/AddCard'
 import IconButton from '../components/IconButton'
 import { categoryEmoji, macroLine } from '../components/LibraryPicker'
 import Photo from '../components/Photo'
@@ -165,13 +165,13 @@ export default function ProductsScreen() {
               </motion.li>
             ))}
             <li>
-              <DashedAddCard
+              <AddCard
                 onClick={() => navigate('/products/dish/new')}
                 className="aspect-square"
                 ariaLabel="Создать блюдо"
               >
                 Добавить
-              </DashedAddCard>
+              </AddCard>
             </li>
           </ul>
         </section>
@@ -200,13 +200,13 @@ export default function ProductsScreen() {
               ))}
             </ul>
           )}
-          <DashedAddCard
+          <AddCard
             onClick={() => navigate('/products/ingredient/new')}
             className="mt-4 py-5"
             ariaLabel="Создать ингредиент"
           >
             Добавить ингредиент
-          </DashedAddCard>
+          </AddCard>
         </section>
       )}
 

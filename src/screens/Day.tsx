@@ -3,7 +3,7 @@ import { Copy, GripVertical, Trash2 } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import BottomSheet from '../components/BottomSheet'
-import DashedAddCard from '../components/DashedAddCard'
+import AddCard from '../components/AddCard'
 import MacroBar from '../components/MacroBar'
 import MealCollage from '../components/MealCollage'
 import ScreenHeader from '../components/ScreenHeader'
@@ -144,9 +144,7 @@ export default function DayScreen() {
                   {tiles.length > 0 ? (
                     <MealCollage tiles={tiles} />
                   ) : (
-                    <span className="flex h-24 items-center justify-center rounded-dashed border-2 border-dashed border-ink text-[15px] font-semibold">
-                      Добавить блюдо
-                    </span>
+                    <AddCard className="h-24">Добавить блюдо</AddCard>
                   )}
                 </motion.button>
               </motion.li>
@@ -155,9 +153,9 @@ export default function DayScreen() {
         </ul>
       )}
 
-      <DashedAddCard onClick={() => setAddOpen(true)} className="mb-3 py-8">
+      <AddCard onClick={() => setAddOpen(true)} className="mb-3 py-8">
         Добавить приём пищи
-      </DashedAddCard>
+      </AddCard>
 
       {meals.length > 0 && (
         <button

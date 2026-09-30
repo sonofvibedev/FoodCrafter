@@ -3,7 +3,7 @@ import { Check, Copy, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import BottomSheet from '../components/BottomSheet'
-import DashedAddCard from '../components/DashedAddCard'
+import AddCard from '../components/AddCard'
 import IconButton from '../components/IconButton'
 import LibraryPicker, { categoryEmoji, type Picked } from '../components/LibraryPicker'
 import MacroBar from '../components/MacroBar'
@@ -134,9 +134,9 @@ export default function MealScreen() {
         })}
       </ul>
 
-      <DashedAddCard onClick={() => setSourceOpen(true)} className="mb-3 py-8">
+      <AddCard onClick={() => setSourceOpen(true)} className="mb-3 py-8">
         Добавить блюдо
-      </DashedAddCard>
+      </AddCard>
 
       <button
         type="button"

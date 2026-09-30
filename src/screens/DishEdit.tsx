@@ -2,7 +2,7 @@ import { Check, ChevronLeft, Trash2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import BottomSheet from '../components/BottomSheet'
-import DashedAddCard from '../components/DashedAddCard'
+import AddCard from '../components/AddCard'
 import IconButton from '../components/IconButton'
 import LibraryPicker, { categoryEmoji } from '../components/LibraryPicker'
 import MacroBar from '../components/MacroBar'
@@ -129,9 +129,9 @@ export default function DishEditScreen() {
           })}
         </ul>
 
-        <DashedAddCard onClick={() => setPickerOpen(true)} className="mb-5 py-4">
+        <AddCard onClick={() => setPickerOpen(true)} className="mb-5 py-4">
           Добавить продукты
-        </DashedAddCard>
+        </AddCard>
 
         <h2 className="mb-2 text-[17px] font-bold">Описание</h2>
         <textarea
