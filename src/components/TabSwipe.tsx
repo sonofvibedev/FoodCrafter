@@ -1,5 +1,5 @@
-import { animate, useMotionTemplate, useMotionValue, motion } from 'framer-motion'
-import { useEffect, useRef, type PointerEvent as ReactPointerEvent } from 'react'
+import { animate, motion, useMotionValue } from 'framer-motion'
+import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { usePrefersReducedMotion } from '../hooks'
 import CartScreen from '../screens/Cart'
@@ -16,21 +16,23 @@ const VELOCITY = 500
 /** Пока не сдвинулись на 10px, направление жеста неизвестно. */
 const DIRECTION_LOCK = 10
 
-const SPRING = { type: 'spring', stiffness: 420, damping: 40 } as const
+/** Доводка трека: короткий tween предсказуемее пружины на широких экранах. */
+const SETTLE = { type: 'tween', duration: 0.28, ease: [0.22, 0.61, 0.36, 1] } as const
 
-/** Элемент запрещает свайп: поле ввода, слайдер или горизонтальный скролл. */
+/**
+ * Открыта шторка или диалог. Смотрим на замок прокрутки body, а не на узел
+ * [role="dialog"]: он ещё живёт, пока шторка доигрывает закрытие.
+ */
+function modalOpen(): boolean {
+  return document.body.style.overflow === 'hidden'
+}
+
+/** Элемент запрещает свайп: поле ввода, слайдер или помеченный контейнер. */
 function blocksSwipe(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) return false
-  if (target.closest('[data-no-swipe],input,textarea,select,[role="slider"],[contenteditable]')) {
-    return true
-  }
-  for (let el: Element | null = target; el; el = el.parentElement) {
-    if (el.scrollWidth > el.clientWidth + 1) {
-      const overflow = getComputedStyle(el).overflowX
-      if (overflow === 'auto' || overflow === 'scroll') return true
-    }
-  }
-  return false
+  return Boolean(
+    target.closest('[data-no-swipe],input,textarea,select,[role="slider"],[contenteditable]'),
+  )
 }
 
 export default function TabSwipe() {
@@ -41,97 +43,151 @@ export default function TabSwipe() {
   const enabled = !isNestedScreen(pathname)
 
   const viewport = useRef<HTMLDivElement>(null)
-  const x = useMotionValue(0)
-  const transform = useMotionTemplate`translateX(calc(${-index * 25}% + ${x}px))`
-
-  const gesture = useRef({ id: -1, x0: 0, y0: 0, t0: 0, axis: '' as '' | 'x' | 'y', width: 1 })
-  /** Свайп сам доводит трек до места; смена раздела мимо свайпа обнуляет сдвиг. */
-  const committing = useRef(false)
+  const [width, setWidth] = useState(0)
+  /** Сдвиг трека в пикселях: и база раздела, и то, что тянет палец. */
+  const trackX = useMotionValue(0)
+  const prevWidth = useRef(0)
   const wheel = useRef({ sum: 0, until: 0 })
 
-  // Индикатор таб-бара догоняет активный раздел после перехода.
   useEffect(() => {
-    if (!committing.current) x.set(0)
-    committing.current = false
-    const controls = animate(tabProgress, index, reduced ? { duration: 0 } : SPRING)
-    return () => controls.stop()
-  }, [index, reduced, x])
+    const el = viewport.current
+    if (!el) return
+    const ro = new ResizeObserver(() => setWidth(el.clientWidth))
+    ro.observe(el)
+    setWidth(el.clientWidth)
+    return () => ro.disconnect()
+  }, [])
 
-  const go = (next: number) => {
-    if (next < 0 || next >= TABS.length || next === index) return false
-    navigate(TABS[next].to)
-    return true
-  }
-
-  // Перелистывание после отпускания: экран доезжает, x возвращается в ноль.
-  const settle = (dx: number, dir: -1 | 0 | 1) => {
-    if (dir !== 0 && go(index + dir)) {
-      committing.current = true
-      x.set(dx + dir * gesture.current.width)
+  // Трек и индикатор таб-бара едут к активному разделу: и после свайпа,
+  // и после нажатия в таб-баре, и после кнопки «Назад» в браузере.
+  useEffect(() => {
+    if (!width) return
+    const instant = prevWidth.current !== width || reduced
+    prevWidth.current = width
+    const track = animate(trackX, -index * width, instant ? { duration: 0 } : SETTLE)
+    const bar = animate(tabProgress, index, reduced ? { duration: 0 } : SETTLE)
+    return () => {
+      track.stop()
+      bar.stop()
     }
-    if (reduced) x.set(0)
-    else animate(x, 0, SPRING)
-  }
+  }, [index, width, reduced, trackX])
 
-  const onPointerDown = (e: ReactPointerEvent) => {
-    if (!enabled || e.pointerType === 'mouse') return
-    // Открытая шторка или диалог забирает жест себе.
-    if (document.querySelector('[role="dialog"]')) return
-    if (blocksSwipe(e.target)) return
-    const width = viewport.current?.clientWidth ?? 1
-    gesture.current = { id: e.pointerId, x0: e.clientX, y0: e.clientY, t0: performance.now(), axis: '', width }
-  }
+  /**
+   * Жест слушаем через touch-события, а не pointer: браузер считает
+   * горизонтальное движение началом прокрутки и забирает pointer-жест себе
+   * через pointercancel. Здесь мы гасим прокрутку через preventDefault —
+   * для этого слушатель touchmove должен быть неленивым (passive: false).
+   */
+  useEffect(() => {
+    const el = viewport.current
+    if (!el || !enabled || !width) return
 
-  const onPointerMove = (e: ReactPointerEvent) => {
-    const g = gesture.current
-    if (g.id !== e.pointerId) return
-    const dx = e.clientX - g.x0
-    const dy = e.clientY - g.y0
+    let id = -1
+    let x0 = 0
+    let y0 = 0
+    let t0 = 0
+    let axis: '' | 'x' | 'y' = ''
 
-    if (g.axis === '') {
-      if (Math.abs(dx) < DIRECTION_LOCK && Math.abs(dy) < DIRECTION_LOCK) return
-      g.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
-      if (g.axis === 'y') {
-        g.id = -1
-        return
+    const settleTo = (target: number) =>
+      animate(trackX, target, reduced ? { duration: 0 } : SETTLE)
+
+    const onStart = (e: TouchEvent) => {
+      id = -1
+      if (e.touches.length !== 1) return
+      if (modalOpen()) return
+      if (blocksSwipe(e.target)) return
+      const t = e.touches[0]
+      id = t.identifier
+      x0 = t.clientX
+      y0 = t.clientY
+      t0 = performance.now()
+      axis = ''
+    }
+
+    const onMove = (e: TouchEvent) => {
+      if (id < 0) return
+      const t = Array.from(e.touches).find((touch) => touch.identifier === id)
+      if (!t) return
+      const dx = t.clientX - x0
+      const dy = t.clientY - y0
+
+      if (axis === '') {
+        if (Math.abs(dx) < DIRECTION_LOCK && Math.abs(dy) < DIRECTION_LOCK) return
+        axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y'
+        // Вертикальный жест отдаём браузеру: это обычная прокрутка.
+        if (axis === 'y') {
+          id = -1
+          return
+        }
+      }
+
+      if (e.cancelable) e.preventDefault()
+      // На крайних разделах ход резиновый.
+      const edge = (index === 0 && dx > 0) || (index === TABS.length - 1 && dx < 0)
+      const shift = edge ? dx * 0.28 : dx
+      trackX.set(-index * width + shift)
+      tabProgress.set(index - shift / width)
+    }
+
+    const onEnd = (e: TouchEvent) => {
+      if (id < 0) return
+      const t = Array.from(e.changedTouches).find((touch) => touch.identifier === id)
+      id = -1
+      if (!t || axis !== 'x') return
+
+      const dx = t.clientX - x0
+      const velocity = (dx / Math.max(1, performance.now() - t0)) * 1000
+      const far = Math.abs(dx) > width * DISTANCE_RATIO || Math.abs(velocity) > VELOCITY
+      const next = index + (dx < 0 ? 1 : -1)
+
+      // Переход доедет сам: эффект выше догонит трек до нового индекса.
+      if (far && next >= 0 && next < TABS.length) navigate(TABS[next].to)
+      else {
+        settleTo(-index * width)
+        animate(tabProgress, index, reduced ? { duration: 0 } : SETTLE)
       }
     }
 
-    // На крайних разделах ход резиновый.
-    const edge = (index === 0 && dx > 0) || (index === TABS.length - 1 && dx < 0)
-    const shift = edge ? dx * 0.28 : dx
-    x.set(shift)
-    tabProgress.set(index - shift / g.width)
-  }
+    const onCancel = () => {
+      if (id < 0) return
+      id = -1
+      settleTo(-index * width)
+      animate(tabProgress, index, reduced ? { duration: 0 } : SETTLE)
+    }
 
-  const onPointerUp = (e: ReactPointerEvent) => {
-    const g = gesture.current
-    if (g.id !== e.pointerId) return
-    g.id = -1
-    if (g.axis !== 'x') return
-
-    const dx = e.clientX - g.x0
-    const dt = Math.max(1, performance.now() - g.t0)
-    const velocity = (dx / dt) * 1000
-    const far = Math.abs(dx) > g.width * DISTANCE_RATIO || Math.abs(velocity) > VELOCITY
-    settle(dx, far ? ((dx < 0 ? 1 : -1) as 1 | -1) : 0)
-  }
+    el.addEventListener('touchstart', onStart, { passive: true })
+    el.addEventListener('touchmove', onMove, { passive: false })
+    el.addEventListener('touchend', onEnd)
+    el.addEventListener('touchcancel', onCancel)
+    return () => {
+      el.removeEventListener('touchstart', onStart)
+      el.removeEventListener('touchmove', onMove)
+      el.removeEventListener('touchend', onEnd)
+      el.removeEventListener('touchcancel', onCancel)
+    }
+  }, [enabled, width, index, reduced, navigate, trackX])
 
   // Десктоп: стрелки и горизонтальный трекпад.
   useEffect(() => {
     if (!enabled) return
 
+    const go = (next: number) => {
+      if (next < 0 || next >= TABS.length || next === index) return false
+      navigate(TABS[next].to)
+      return true
+    }
+
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return
       if (e.metaKey || e.ctrlKey || e.altKey) return
-      if (document.querySelector('[role="dialog"]')) return
+      if (modalOpen()) return
       if (blocksSwipe(e.target)) return
       go(index + (e.key === 'ArrowRight' ? 1 : -1))
     }
 
     const onWheel = (e: WheelEvent) => {
       if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return
-      if (document.querySelector('[role="dialog"]')) return
+      if (modalOpen()) return
       if (blocksSwipe(e.target)) return
       const now = performance.now()
       if (now < wheel.current.until) return
@@ -147,20 +203,13 @@ export default function TabSwipe() {
       window.removeEventListener('keydown', onKey)
       window.removeEventListener('wheel', onWheel)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [enabled, index])
+  }, [enabled, index, navigate])
 
   return (
-    <div
-      className="fixed inset-0 lg:pl-[110px]"
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onPointerCancel={onPointerUp}
-    >
+    <div className="fixed inset-0 lg:pl-[110px]">
       {/* Отдельный слой обрезки: иначе соседний раздел вылезает под сайдбар. */}
-      <div ref={viewport} className="h-full overflow-hidden">
-        <motion.div className="flex h-full w-[400%]" style={{ transform }}>
+      <div ref={viewport} className="h-full touch-pan-y overflow-hidden">
+        <motion.div className="flex h-full w-[400%]" style={{ x: trackX }}>
           {PANES.map((Pane, i) => (
             <div
               key={TABS[i].to}

@@ -22,7 +22,7 @@ export interface Release {
   changes: Partial<Record<ChangeKind, string[]>>
 }
 
-export const APP_VERSION = '1.1'
+export const APP_VERSION = '1.1.1'
 
 export const KIND_TITLE: Record<ChangeKind, string> = {
   global: 'Глобальные',
@@ -33,6 +33,17 @@ export const KIND_TITLE: Record<ChangeKind, string> = {
 export const KIND_ORDER: ChangeKind[] = ['global', 'important', 'local']
 
 export const CHANGELOG: Release[] = [
+  {
+    version: '1.1.1',
+    date: '2026-09-30',
+    title: 'Починка навигации',
+    changes: {
+      important: [
+        'Свайп снова работает в обе стороны. Раньше браузер считал горизонтальное движение началом прокрутки и забирал жест себе на полпути, поэтому листалось только в одну сторону.',
+        'Нажатие в таб-баре открывает раздел сразу. Раньше на неактивном разделе экран оставался пустым до перезагрузки страницы.',
+      ],
+    },
+  },
   {
     version: '1.1',
     date: '2026-09-30',
