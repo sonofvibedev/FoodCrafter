@@ -12,7 +12,7 @@ import { dayMacros, mealMacros } from '../lib/calc'
 import { formatDay, today, weekdayName } from '../lib/date'
 import { useStore } from '../store'
 import type { Meal } from '../types'
-import { tilesOf } from './Plan'
+import { tilesOf } from '../lib/tiles'
 
 const PRESETS = ['Завтрак', 'Обед', 'Ужин', 'Перекус']
 

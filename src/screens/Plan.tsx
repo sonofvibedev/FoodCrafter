@@ -8,6 +8,7 @@ import Screen from '../components/Screen'
 import SegmentedControl from '../components/SegmentedControl'
 import { useDishMap, useIngredientMap, useTargets } from '../hooks'
 import { dayMacros } from '../lib/calc'
+import { tilesOf } from '../lib/tiles'
 import {
   WEEKDAYS_SHORT,
   addDays,
@@ -22,7 +23,6 @@ import {
   weekdayName,
 } from '../lib/date'
 import { useStore } from '../store'
-import type { Meal } from '../types'
 import DayScreen from './Day'
 import MealScreen from './Meal'
 
@@ -98,19 +98,6 @@ function useDayTiles() {
   return useMemo(
     () => (date: string) => tilesOf(days[date] ?? [], ingredients, dishes),
     [days, ingredients, dishes],
-  )
-}
-
-export function tilesOf(
-  meals: Meal[],
-  ingredients: Map<string, { name: string; emoji?: string; photo?: string }>,
-  dishes: Map<string, { name: string; emoji?: string; photo?: string }>,
-) {
-  return meals.flatMap((m) =>
-    m.items.map((p) => {
-      const src = p.ref.kind === 'dish' ? dishes.get(p.ref.dishId) : ingredients.get(p.ref.ingredientId)
-      return { src: src?.photo, emoji: src?.emoji, alt: src?.name ?? 'Блюдо' }
-    }),
   )
 }
 

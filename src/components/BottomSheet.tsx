@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 interface Props {
@@ -11,16 +11,52 @@ interface Props {
   hideTitle?: boolean
 }
 
-/** Нижняя шторка с закрытием свайпом вниз. */
+const FOCUSABLE =
+  'a[href],button:not([disabled]),input:not([disabled]),select:not([disabled]),textarea:not([disabled]),[tabindex]:not([tabindex="-1"])'
+
+/** Нижняя шторка с закрытием свайпом вниз, Esc и ловушкой фокуса. */
 export default function BottomSheet({ open, onClose, title, children, hideTitle }: Props) {
+  const panel = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    const restore = document.activeElement as HTMLElement | null
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab' || !panel.current) return
+      // Ловушка фокуса: Tab не выпускает за пределы шторки.
+      const items = [...panel.current.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(
+        (el) => el.offsetParent !== null,
+      )
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      const active = document.activeElement
+      if (e.shiftKey && (active === first || !panel.current.contains(active))) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && active === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
     document.addEventListener('keydown', onKey)
     document.body.style.overflow = 'hidden'
+    const focusTimer = setTimeout(() => {
+      const items = panel.current?.querySelectorAll<HTMLElement>(FOCUSABLE)
+      items?.[0]?.focus()
+    }, 60)
+
     return () => {
+      clearTimeout(focusTimer)
       document.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
+      restore?.focus?.()
     }
   }, [open, onClose])
 
@@ -37,6 +73,7 @@ export default function BottomSheet({ open, onClose, title, children, hideTitle 
             aria-hidden
           />
           <motion.div
+            ref={panel}
             role="dialog"
             aria-modal="true"
             aria-label={title}
@@ -59,9 +96,7 @@ export default function BottomSheet({ open, onClose, title, children, hideTitle 
             <div className="flex shrink-0 cursor-grab justify-center pt-2 pb-1 active:cursor-grabbing">
               <span className="h-1 w-10 rounded-full bg-line" aria-hidden />
             </div>
-            {!hideTitle && (
-              <h2 className="shrink-0 px-4 pb-2 text-[20px] font-bold">{title}</h2>
-            )}
+            {!hideTitle && <h2 className="shrink-0 px-4 pb-2 text-[20px] font-bold">{title}</h2>}
             <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-4">
               {children}
             </div>

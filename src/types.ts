@@ -96,7 +96,16 @@ export const PALETTES: { id: PaletteId; title: string; preview: string }[] = [
   { id: '2', title: 'Тёплый персик', preview: 'linear-gradient(135deg,#FF9A76,#F2542D)' },
   { id: '3', title: 'Ночной океан', preview: 'linear-gradient(135deg,#4F8CFF,#1B3FA8)' },
   { id: '4', title: 'Ягодный смузи', preview: 'linear-gradient(135deg,#A855F7,#EC4899)' },
-  { id: '5', title: 'Графит и лайм', preview: 'linear-gradient(135deg,#C6F432,#1A1A17)' },
+  { id: '5', title: 'Графит и лайм', preview: 'linear-gradient(135deg,#C6F432 50%,#1A1A17 50%)' },
+]
+
+/** Коэффициенты активности Миффлина—Сан Жеора. */
+export const ACTIVITY = [
+  { value: 1.2, label: 'Сидячий образ жизни' },
+  { value: 1.375, label: 'Лёгкая активность, 1–3 тренировки' },
+  { value: 1.55, label: 'Средняя активность, 3–5 тренировок' },
+  { value: 1.725, label: 'Высокая активность, 6–7 тренировок' },
+  { value: 1.9, label: 'Очень высокая, физическая работа' },
 ]
 
 export const GOAL_TITLE: Record<Goal, string> = {

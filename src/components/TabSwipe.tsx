@@ -45,13 +45,17 @@ export default function TabSwipe() {
   const transform = useMotionTemplate`translateX(calc(${-index * 25}% + ${x}px))`
 
   const gesture = useRef({ id: -1, x0: 0, y0: 0, t0: 0, axis: '' as '' | 'x' | 'y', width: 1 })
+  /** Свайп сам доводит трек до места; смена раздела мимо свайпа обнуляет сдвиг. */
+  const committing = useRef(false)
   const wheel = useRef({ sum: 0, until: 0 })
 
   // Индикатор таб-бара догоняет активный раздел после перехода.
   useEffect(() => {
+    if (!committing.current) x.set(0)
+    committing.current = false
     const controls = animate(tabProgress, index, reduced ? { duration: 0 } : SPRING)
     return () => controls.stop()
-  }, [index, reduced])
+  }, [index, reduced, x])
 
   const go = (next: number) => {
     if (next < 0 || next >= TABS.length || next === index) return false
@@ -62,6 +66,7 @@ export default function TabSwipe() {
   // Перелистывание после отпускания: экран доезжает, x возвращается в ноль.
   const settle = (dx: number, dir: -1 | 0 | 1) => {
     if (dir !== 0 && go(index + dir)) {
+      committing.current = true
       x.set(dx + dir * gesture.current.width)
     }
     if (reduced) x.set(0)

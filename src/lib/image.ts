@@ -23,3 +23,39 @@ export function compressImage(file: File): Promise<string> {
     img.src = url
   })
 }
+
+const AVATAR_SIDE = 256
+
+/** Обрезает фото по центру в квадрат 256x256 и отдаёт JPEG как data URL. */
+export function compressAvatar(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      URL.revokeObjectURL(url)
+      const side = Math.min(img.width, img.height)
+      const canvas = document.createElement('canvas')
+      canvas.width = AVATAR_SIDE
+      canvas.height = AVATAR_SIDE
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return reject(new Error('Нет 2d-контекста'))
+      ctx.drawImage(
+        img,
+        (img.width - side) / 2,
+        (img.height - side) / 2,
+        side,
+        side,
+        0,
+        0,
+        AVATAR_SIDE,
+        AVATAR_SIDE,
+      )
+      resolve(canvas.toDataURL('image/jpeg', 0.82))
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(url)
+      reject(new Error('Не удалось прочитать изображение'))
+    }
+    img.src = url
+  })
+}

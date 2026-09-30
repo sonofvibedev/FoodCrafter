@@ -1,9 +1,10 @@
 import { Search, SlidersHorizontal } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useStore } from '../store'
-import { CATEGORIES, type CategoryId, type Dish, type Ingredient } from '../types'
+import type { CategoryId, Dish, Ingredient } from '../types'
 import { useIngredientMap } from '../hooks'
 import { dishMacrosPer100, dishWeight } from '../lib/calc'
+import { categoryEmoji, macroLine } from '../lib/format'
 import ProductRow from './ProductRow'
 import SegmentedControl from './SegmentedControl'
 import CategoryFilter from './CategoryFilter'
@@ -176,18 +177,4 @@ function Row({
       onClick={() => onPick(picked)}
     />
   )
-}
-
-export function macroLine(m: { kcal: number; protein: number; fat: number; carbs: number }) {
-  return `К ${Math.round(m.kcal)}  Б ${r(m.protein)}  Ж ${r(m.fat)}  У ${r(m.carbs)}`
-}
-
-const r = (n: number) => Math.round(n * 10) / 10
-
-export function categoryEmoji(id: CategoryId) {
-  return CATEGORIES.find((c) => c.id === id)?.emoji ?? '🍽️'
-}
-
-export function categoryTitle(id: CategoryId) {
-  return CATEGORIES.find((c) => c.id === id)?.title ?? 'Другое'
 }
