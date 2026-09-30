@@ -16,10 +16,13 @@ import { tilesOf } from '../lib/tiles'
 
 const PRESETS = ['Завтрак', 'Обед', 'Ужин', 'Перекус']
 
+/** Один и тот же пустой массив: новая ссылка на каждое чтение стора зациклила бы рендер. */
+const NO_MEALS: Meal[] = []
+
 export default function DayScreen() {
   const { date = today() } = useParams()
   const navigate = useNavigate()
-  const meals = useStore((s) => s.days[date] ?? [])
+  const meals = useStore((s) => s.days[date]) ?? NO_MEALS
   const ingredients = useIngredientMap()
   const dishes = useDishMap()
   const target = useTargets()
