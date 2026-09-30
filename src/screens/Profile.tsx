@@ -17,11 +17,13 @@ import CountUp from '../components/CountUp'
 import MacroBar from '../components/MacroBar'
 import ProfileEditSheet from '../components/ProfileEditSheet'
 import ProgressRing from '../components/ProgressRing'
+import WhatsNew from '../components/WhatsNew'
 import Screen from '../components/Screen'
 import SegmentedControl from '../components/SegmentedControl'
 import { useDishMap, useIngredientMap, useTargets } from '../hooks'
 import { bmr, dailyKcal, dayMacros } from '../lib/calc'
 import { today } from '../lib/date'
+import { APP_VERSION } from '../changelog'
 import { exportPayload, useStore } from '../store'
 import {
   ACTIVITY,
@@ -56,6 +58,7 @@ export default function ProfileScreen() {
   const fileRef = useRef<HTMLInputElement>(null)
   const [confirmReset, setConfirmReset] = useState(false)
   const [editOpen, setEditOpen] = useState(false)
+  const [newsOpen, setNewsOpen] = useState(false)
   const [toast, setToast] = useState<string | null>(null)
 
   const eaten = useMemo(
@@ -297,6 +300,19 @@ export default function ProfileScreen() {
           </button>
         </div>
       </section>
+
+      <p className="mt-6 text-center text-[13px] text-ink2">
+        FoodCrafter · версия{' '}
+        <button
+          type="button"
+          onClick={() => setNewsOpen(true)}
+          className="font-semibold text-accent tabular-nums underline-offset-4 hover:underline"
+        >
+          {APP_VERSION}
+        </button>
+      </p>
+
+      <WhatsNew full open={newsOpen} onClose={() => setNewsOpen(false)} />
 
       <ProfileEditSheet
         open={editOpen}

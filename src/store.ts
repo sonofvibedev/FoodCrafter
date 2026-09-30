@@ -44,6 +44,8 @@ interface State {
   /** id ингредиентов и блюд в порядке последнего использования. */
   recent: string[]
   demo: boolean
+  /** Последняя версия, для которой показали окно «Что нового». */
+  seenVersion?: string
 
   // библиотека
   saveIngredient: (i: Ingredient) => void
@@ -73,6 +75,7 @@ interface State {
 
   // профиль и данные
   setProfile: (patch: Partial<Profile>) => void
+  setSeenVersion: (version: string) => void
   clearDemo: () => void
   resetAll: () => void
   importAll: (raw: unknown) => void
@@ -268,6 +271,8 @@ export const useStore = create<State>()(
 
       setProfile: (patch) => set((s) => ({ profile: { ...s.profile, ...patch } })),
 
+      setSeenVersion: (version) => set({ seenVersion: version }),
+
       clearDemo: () =>
         set((s) => ({
           ingredients: s.ingredients.filter((x) => !DEMO_IDS.ingredients.includes(x.id)),
@@ -328,6 +333,7 @@ export const useStore = create<State>()(
         cart: s.cart,
         recent: s.recent,
         demo: s.demo,
+        seenVersion: s.seenVersion,
       }),
     },
   ),
