@@ -155,6 +155,7 @@ export default function ProfileEditSheet({ open, profile, onClose, onSave }: Pro
           ref={fileRef}
           type="file"
           accept="image/*"
+          aria-label="Фото профиля"
           className="sr-only"
           onChange={async (e) => {
             const file = e.target.files?.[0]

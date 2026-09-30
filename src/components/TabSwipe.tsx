@@ -152,26 +152,28 @@ export default function TabSwipe() {
 
   return (
     <div
-      ref={viewport}
-      className="fixed inset-0 overflow-hidden lg:pl-[110px]"
+      className="fixed inset-0 lg:pl-[110px]"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
     >
-      <motion.div className="flex h-full w-[400%]" style={{ transform }}>
-        {PANES.map((Pane, i) => (
-          <div
-            key={TABS[i].to}
-            className="h-full w-1/4 shrink-0 overflow-y-auto overscroll-y-contain"
-            aria-hidden={i === index ? undefined : true}
-            inert={i !== index}
-          >
-            {/* Держим в памяти активный раздел и соседей: остальное не рисуем. */}
-            {Math.abs(i - index) <= 1 ? <Pane /> : null}
-          </div>
-        ))}
-      </motion.div>
+      {/* Отдельный слой обрезки: иначе соседний раздел вылезает под сайдбар. */}
+      <div ref={viewport} className="h-full overflow-hidden">
+        <motion.div className="flex h-full w-[400%]" style={{ transform }}>
+          {PANES.map((Pane, i) => (
+            <div
+              key={TABS[i].to}
+              className="h-full w-1/4 shrink-0 overflow-y-auto overscroll-y-contain"
+              aria-hidden={i === index ? undefined : true}
+              inert={i !== index}
+            >
+              {/* Держим в памяти активный раздел и соседей: остальное не рисуем. */}
+              {Math.abs(i - index) <= 1 ? <Pane /> : null}
+            </div>
+          ))}
+        </motion.div>
+      </div>
     </div>
   )
 }

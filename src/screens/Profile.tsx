@@ -267,6 +267,7 @@ export default function ProfileScreen() {
             ref={fileRef}
             type="file"
             accept="application/json"
+            aria-label="Файл выгрузки FoodCrafter"
             className="sr-only"
             onChange={(e) => {
               const f = e.target.files?.[0]
