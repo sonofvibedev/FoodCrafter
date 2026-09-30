@@ -88,6 +88,22 @@ export type Days = Record<string, Meal[]>
 export type Sex = 'male' | 'female'
 export type Goal = 'lose' | 'keep' | 'gain'
 export type ThemeMode = 'light' | 'dark' | 'system'
+export type PaletteId = '1' | '2' | '3' | '4' | '5'
+
+/** Палитры оформления. Цвета живут в CSS, здесь — только подписи и превью. */
+export const PALETTES: { id: PaletteId; title: string; preview: string }[] = [
+  { id: '1', title: 'Свежая зелень', preview: 'linear-gradient(135deg,#4CC98E,#2A8A5E)' },
+  { id: '2', title: 'Тёплый персик', preview: 'linear-gradient(135deg,#FF9A76,#F2542D)' },
+  { id: '3', title: 'Ночной океан', preview: 'linear-gradient(135deg,#4F8CFF,#1B3FA8)' },
+  { id: '4', title: 'Ягодный смузи', preview: 'linear-gradient(135deg,#A855F7,#EC4899)' },
+  { id: '5', title: 'Графит и лайм', preview: 'linear-gradient(135deg,#C6F432,#1A1A17)' },
+]
+
+export const GOAL_TITLE: Record<Goal, string> = {
+  lose: 'Похудение',
+  keep: 'Поддержание',
+  gain: 'Набор',
+}
 
 export interface Profile {
   name: string
@@ -103,6 +119,10 @@ export interface Profile {
   /** Распределение БЖУ в процентах от калорийности. */
   macroSplit: { protein: number; fat: number; carbs: number }
   theme: ThemeMode
+  /** Выбранная палитра оформления. */
+  palette: PaletteId
+  /** Аватар: data URL 256x256 JPEG. */
+  avatar?: string
 }
 
 export interface ManualCartItem {
