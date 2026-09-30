@@ -3,6 +3,7 @@ import { HashRouter, Navigate, Route, Routes, useLocation } from 'react-router-d
 import Background from './components/Background'
 import TabBar from './components/TabBar'
 import TabSwipe from './components/TabSwipe'
+import { WhatsNewOnUpdate } from './components/WhatsNew'
 import DishScreen from './screens/Dish'
 import DishEditScreen from './screens/DishEdit'
 import IngredientEditScreen from './screens/IngredientEdit'
@@ -75,6 +76,7 @@ export default function App() {
       <Background />
       <Body />
       <TabBar />
+      <WhatsNewOnUpdate />
     </HashRouter>
   )
 }
