@@ -24,6 +24,7 @@ const DEFAULT_PROFILE: Profile = {
   goal: 'keep',
   macroSplit: { protein: 30, fat: 30, carbs: 40 },
   theme: 'system',
+  palette: '1',
 }
 
 export interface CartState {
@@ -310,7 +311,15 @@ export const useStore = create<State>()(
     }),
     {
       name: 'foodcrafter',
-      version: 1,
+      version: 2,
+      // v1 не знал про палитру и аватар: дозаливаем поля профиля из умолчаний,
+      // иначе у старых пользователей profile.palette будет undefined.
+      migrate: (state, from) => {
+        const s = state as Partial<State> | undefined
+        if (!s) return s as never
+        if (from < 2) return { ...s, profile: { ...DEFAULT_PROFILE, ...(s.profile ?? {}) } } as never
+        return s as never
+      },
       partialize: (s) => ({
         ingredients: s.ingredients,
         dishes: s.dishes,

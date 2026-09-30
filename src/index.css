@@ -1,60 +1,233 @@
 @import 'tailwindcss';
 
-/* ---- Дизайн-токены, снятые с макета Figma (FoodCrafter, ширина 402px) ---- */
+/* ---------------------------------------------------------------------------
+   Палитры. Пять тем, у каждой светлый и тёмный режим.
+   data-palette — номер темы, data-theme — режим (ставит useTheme в App.tsx).
+   Токены: --bg, --bg-grad, --surface, --surface-2, --text, --text-2, --accent,
+   --accent-contrast, --accent-soft, --add-bg, --add-border, --add-text,
+   --tabbar-bg.
+--------------------------------------------------------------------------- */
+
 :root {
-  --fc-accent: #0076fd;
-  --fc-accent-press: #0062d6;
-  --fc-danger: #f22f2f;
-
-  --fc-bg: #f2f2f2;
-  --fc-surface: #ffffff;
-  --fc-muted: #ededed;
-  --fc-placeholder: #dddddd;
-  --fc-photo-fallback: #a8a8a8;
-
-  --fc-text: #000000;
-  --fc-text-2: #8e8e93;
-  --fc-line: #d9d9d9;
-
-  --fc-tabbar: #737373;
-  --fc-tabbar-item: rgba(255, 255, 255, 0.12);
-
   --fc-r-card: 28px;
   --fc-r-dashed: 25px;
   --fc-r-tile: 16px;
   --fc-r-sheet: 24px;
 
+  /* Тема 1 «Свежая зелень», светлый режим — значения по умолчанию. */
+  --bg: #f1f8f3;
+  --bg-grad: linear-gradient(160deg, #eaf6ee, #f7fbf5 60%, #dff1e6);
+  --surface: #ffffff;
+  --surface-2: #eef6f0;
+  --text: #0e1a13;
+  --text-2: #4b6155;
+  --accent: #3fb37f;
+  --accent-2: #2f9a6b;
+  --accent-grad: linear-gradient(135deg, #4cc98e, #2a8a5e);
+  --accent-contrast: #ffffff;
+  --add-text: #1e6b4b;
+  --tabbar-bg: #17352a;
+  --danger: #d92d20;
+
   color-scheme: light;
 }
 
 :root[data-theme='dark'] {
-  --fc-bg: #000000;
-  --fc-surface: #1c1c1e;
-  --fc-muted: #2c2c2e;
-  --fc-placeholder: #3a3a3c;
-  --fc-photo-fallback: #48484a;
-
-  --fc-text: #ffffff;
-  --fc-text-2: #98989f;
-  --fc-line: #38383a;
-
-  --fc-tabbar: #3a3a3c;
-  --fc-tabbar-item: rgba(255, 255, 255, 0.08);
+  --bg: #0e1a13;
+  --bg-grad: linear-gradient(160deg, #0e1a13, #132319 60%, #0b1510);
+  --surface: #1b2c22;
+  --surface-2: #14241b;
+  --text: #f2f8f4;
+  --text-2: #9dbcac;
+  --accent: #4ec994;
+  --accent-2: #3fb37f;
+  --accent-contrast: #06231a;
+  --add-text: #7fe0b4;
+  --tabbar-bg: #17352a;
+  --danger: #ff6b5e;
 
   color-scheme: dark;
 }
 
+/* ------------------------------ 2. Тёплый персик ------------------------- */
+:root[data-palette='2'] {
+  --bg: #fff6f0;
+  --bg-grad: linear-gradient(160deg, #fff1e6, #fff8f2 55%, #ffe3d6);
+  --surface: #ffffff;
+  --surface-2: #fff0e7;
+  --text: #24140e;
+  --text-2: #6b4a3c;
+  --accent: #ff7a59;
+  --accent-2: #e85d3c;
+  --accent-grad: linear-gradient(135deg, #ff9a76, #f2542d);
+  --accent-contrast: #ffffff;
+  --add-text: #b23f22;
+  --tabbar-bg: #33231d;
+  --danger: #cf2b1d;
+}
+
+:root[data-palette='2'][data-theme='dark'] {
+  --bg: #1e1411;
+  --bg-grad: linear-gradient(160deg, #1e1411, #261915 60%, #170f0c);
+  --surface: #33231d;
+  --surface-2: #261915;
+  --text: #fdf1ec;
+  --text-2: #c3a094;
+  --accent: #ff8a6b;
+  --accent-2: #ff7a59;
+  --accent-contrast: #2b0f06;
+  --add-text: #ffab92;
+  --tabbar-bg: #33231d;
+  --danger: #ff6b5e;
+}
+
+/* ------------------------------ 3. Ночной океан -------------------------- */
+:root[data-palette='3'] {
+  --bg: #f2f6ff;
+  --bg-grad: linear-gradient(160deg, #e8f0ff, #f5f8ff 55%, #dce8ff);
+  --surface: #ffffff;
+  --surface-2: #eaf1ff;
+  --text: #0c1733;
+  --text-2: #4c5b7d;
+  --accent: #2f7dff;
+  --accent-2: #1a56d6;
+  --accent-grad: linear-gradient(135deg, #4f8cff, #1b3fa8);
+  --accent-contrast: #ffffff;
+  --add-text: #1a56d6;
+  --tabbar-bg: #12204a;
+  --danger: #d92d20;
+}
+
+:root[data-palette='3'][data-theme='dark'] {
+  --bg: #0a1024;
+  --bg-grad: linear-gradient(160deg, #0a1024, #12204a 60%, #0a132e);
+  --surface: #172a57;
+  --surface-2: #101e42;
+  --text: #eef3ff;
+  --text-2: #a3b4dc;
+  --accent: #6aa0ff;
+  --accent-2: #2f7dff;
+  --accent-contrast: #05112e;
+  --add-text: #9dbeff;
+  --tabbar-bg: #12204a;
+  --danger: #ff6b5e;
+}
+
+/* ------------------------------ 4. Ягодный смузи ------------------------- */
+:root[data-palette='4'] {
+  --bg: #f8f1ff;
+  --bg-grad: linear-gradient(150deg, #f6ecff, #fff0f6 55%, #ede4ff);
+  --surface: #ffffff;
+  --surface-2: #f6eeff;
+  --text: #1e1028;
+  --text-2: #5f4a72;
+  --accent: #b249e8;
+  --accent-2: #ec4899;
+  --accent-grad: linear-gradient(135deg, #a855f7, #ec4899);
+  --accent-contrast: #ffffff;
+  --add-text: #8b2bc9;
+  --tabbar-bg: #2e1a3d;
+  --danger: #d92d20;
+}
+
+:root[data-palette='4'][data-theme='dark'] {
+  --bg: #170d22;
+  --bg-grad: linear-gradient(150deg, #170d22, #24112e 55%, #1a0c1f);
+  --surface: #2e1a3d;
+  --surface-2: #21122c;
+  --text: #f7edff;
+  --text-2: #bda3d1;
+  --accent: #c76bf5;
+  --accent-2: #f472b6;
+  --accent-contrast: #1b0527;
+  --add-text: #e879f9;
+  --tabbar-bg: #2e1a3d;
+  --danger: #ff6b5e;
+}
+
+/* ------------------------------ 5. Графит и лайм ------------------------- */
+:root[data-palette='5'] {
+  --bg: #f2f2ec;
+  --bg-grad: none;
+  --surface: #ffffff;
+  --surface-2: #eaeae2;
+  --text: #17170f;
+  --text-2: #5c5c50;
+  --accent: #5e7a0b;
+  --accent-2: #465c06;
+  --accent-grad: linear-gradient(135deg, #7d9c16, #465c06);
+  --accent-contrast: #ffffff;
+  --add-text: #465c06;
+  --tabbar-bg: #1a1a17;
+  --danger: #c02617;
+}
+
+:root[data-palette='5'][data-theme='dark'] {
+  --bg: #111110;
+  --bg-grad: none;
+  --surface: #1e1e1b;
+  --surface-2: #171714;
+  --text: #f4f4ef;
+  --text-2: #a3a398;
+  --accent: #c6f432;
+  --accent-2: #b0dd1f;
+  --accent-contrast: #1a1a17;
+  --add-text: #c6f432;
+  --tabbar-bg: #1a1a17;
+  --danger: #ff6b5e;
+}
+
+/* Производные токены — одни и те же формулы для всех палитр. */
+:root {
+  --accent-soft: color-mix(in oklab, var(--accent) 14%, transparent);
+  --add-bg: color-mix(in oklab, var(--accent) 10%, transparent);
+  --add-bg-strong: color-mix(in oklab, var(--accent) 18%, transparent);
+  --add-border: color-mix(in oklab, var(--accent) 38%, transparent);
+  --line: color-mix(in oklab, var(--text) 14%, transparent);
+  --muted: color-mix(in oklab, var(--text) 7%, transparent);
+  --placeholder: color-mix(in oklab, var(--text) 12%, transparent);
+  --photo-fallback: color-mix(in oklab, var(--text) 32%, transparent);
+}
+
+:root[data-theme='dark'] {
+  --line: color-mix(in oklab, var(--text) 18%, transparent);
+  --muted: color-mix(in oklab, var(--text) 10%, transparent);
+  --placeholder: color-mix(in oklab, var(--text) 16%, transparent);
+  --photo-fallback: color-mix(in oklab, var(--text) 30%, transparent);
+}
+
+/* Старые имена токенов: часть кода ссылается на них напрямую. */
+:root {
+  --fc-accent: var(--accent);
+  --fc-accent-press: var(--accent-2);
+  --fc-danger: var(--danger);
+  --fc-bg: var(--bg);
+  --fc-surface: var(--surface);
+  --fc-muted: var(--muted);
+  --fc-placeholder: var(--placeholder);
+  --fc-photo-fallback: var(--photo-fallback);
+  --fc-text: var(--text);
+  --fc-text-2: var(--text-2);
+  --fc-line: var(--line);
+  --fc-tabbar: var(--tabbar-bg);
+  --fc-tabbar-item: rgba(255, 255, 255, 0.1);
+}
+
 @theme inline {
-  --color-accent: var(--fc-accent);
-  --color-danger: var(--fc-danger);
-  --color-bg: var(--fc-bg);
-  --color-surface: var(--fc-surface);
-  --color-muted: var(--fc-muted);
-  --color-placeholder: var(--fc-placeholder);
-  --color-ink: var(--fc-text);
-  --color-ink2: var(--fc-text-2);
-  --color-line: var(--fc-line);
-  --color-tabbar: var(--fc-tabbar);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--accent-contrast);
+  --color-danger: var(--danger);
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface2: var(--surface-2);
+  --color-muted: var(--muted);
+  --color-placeholder: var(--placeholder);
+  --color-ink: var(--text);
+  --color-ink2: var(--text-2);
+  --color-line: var(--line);
+  --color-tabbar: var(--tabbar-bg);
 
   --radius-card: var(--fc-r-card);
   --radius-dashed: var(--fc-r-dashed);
@@ -75,8 +248,8 @@
 
   body {
     margin: 0;
-    background: var(--fc-bg);
-    color: var(--fc-text);
+    background: var(--bg);
+    color: var(--text);
     font-family: var(--font-sans);
     font-size: 15px;
     -webkit-font-smoothing: antialiased;
@@ -94,7 +267,7 @@
 
   /* Видимый фокус только с клавиатуры */
   :focus-visible {
-    outline: 3px solid var(--fc-accent);
+    outline: 3px solid var(--accent);
     outline-offset: 2px;
     border-radius: 8px;
   }
@@ -110,6 +283,95 @@
   display: none;
 }
 
+/* ------------------------------- Живой фон ------------------------------- */
+
+.fc-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-color: var(--bg);
+  background-image: var(--bg-grad);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.fc-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  will-change: transform;
+}
+
+.fc-blob-1 {
+  top: -12%;
+  left: -14%;
+  width: 62vmax;
+  height: 62vmax;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  opacity: 0.22;
+  animation: fc-float-1 26s ease-in-out infinite alternate;
+}
+
+.fc-blob-2 {
+  right: -18%;
+  bottom: 4%;
+  width: 54vmax;
+  height: 54vmax;
+  background: radial-gradient(circle, var(--accent-2) 0%, transparent 70%);
+  opacity: 0.18;
+  animation: fc-float-2 30s ease-in-out infinite alternate;
+}
+
+.fc-blob-3 {
+  top: 34%;
+  right: 10%;
+  width: 40vmax;
+  height: 40vmax;
+  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  opacity: 0.15;
+  animation: fc-float-3 22s ease-in-out infinite alternate;
+}
+
+@keyframes fc-float-1 {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(8vmax, 6vmax, 0) scale(1.12);
+  }
+}
+@keyframes fc-float-2 {
+  from {
+    transform: translate3d(0, 0, 0) scale(1.08);
+  }
+  to {
+    transform: translate3d(-7vmax, -5vmax, 0) scale(1);
+  }
+}
+@keyframes fc-float-3 {
+  from {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    transform: translate3d(-5vmax, 7vmax, 0) scale(1.15);
+  }
+}
+
+/* Плавная смена палитры: класс висит на html 320 мс после переключения. */
+.theme-switching,
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition:
+    background-color 300ms ease,
+    background-image 300ms ease,
+    border-color 300ms ease,
+    color 300ms ease,
+    fill 300ms ease,
+    stroke 300ms ease,
+    box-shadow 300ms ease !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -117,5 +379,9 @@
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
+  }
+
+  .fc-blob {
+    animation: none !important;
   }
 }

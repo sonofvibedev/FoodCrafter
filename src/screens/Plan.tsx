@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion'
 import { CalendarDays, ChevronLeft, ChevronRight } from 'lucide-react'
 import { useMemo, useState } from 'react'
-import { Outlet, useMatch, useNavigate } from 'react-router-dom'
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import AddCard from '../components/AddCard'
 import MealCollage from '../components/MealCollage'
 import Screen from '../components/Screen'
 import SegmentedControl from '../components/SegmentedControl'
 import { useDishMap, useIngredientMap, useTargets } from '../hooks'
 import { dayMacros } from '../lib/calc'
+import { tilesOf } from '../lib/tiles'
 import {
   WEEKDAYS_SHORT,
   addDays,
@@ -21,12 +23,15 @@ import {
   weekdayName,
 } from '../lib/date'
 import { useStore } from '../store'
-import type { Meal } from '../types'
+import DayScreen from './Day'
+import MealScreen from './Meal'
 
 type Mode = 'week' | 'month'
 
 export default function PlanLayout() {
-  const detail = useMatch('/plan/day/*')
+  // Раздел смонтирован на любом URL (его держит свайп-контейнер), поэтому
+  // вложенный экран дня подбираем сами, а не через Outlet родительского роута.
+  const detail = /^\/plan\/day\//.test(useLocation().pathname)
 
   return (
     <Screen>
@@ -40,7 +45,10 @@ export default function PlanLayout() {
         </div>
         {detail && (
           <div className="lg:sticky lg:top-6">
-            <Outlet />
+            <Routes>
+              <Route path="/plan/day/:date" element={<DayScreen />} />
+              <Route path="/plan/day/:date/meal/:mealId" element={<MealScreen />} />
+            </Routes>
           </div>
         )}
       </div>
@@ -90,19 +98,6 @@ function useDayTiles() {
   return useMemo(
     () => (date: string) => tilesOf(days[date] ?? [], ingredients, dishes),
     [days, ingredients, dishes],
-  )
-}
-
-export function tilesOf(
-  meals: Meal[],
-  ingredients: Map<string, { name: string; emoji?: string; photo?: string }>,
-  dishes: Map<string, { name: string; emoji?: string; photo?: string }>,
-) {
-  return meals.flatMap((m) =>
-    m.items.map((p) => {
-      const src = p.ref.kind === 'dish' ? dishes.get(p.ref.dishId) : ingredients.get(p.ref.ingredientId)
-      return { src: src?.photo, emoji: src?.emoji, alt: src?.name ?? 'Блюдо' }
-    }),
   )
 }
 
@@ -181,9 +176,7 @@ function WeekView({ anchor, setAnchor }: { anchor: string; setAnchor: (s: string
                 {tiles.length > 0 ? (
                   <MealCollage tiles={tiles} className="aspect-square" />
                 ) : (
-                  <span className="flex aspect-square items-center justify-center rounded-dashed border-2 border-dashed border-ink text-[17px] font-semibold">
-                    Добавить
-                  </span>
+                  <AddCard className="aspect-square" />
                 )}
               </motion.button>
             </motion.li>

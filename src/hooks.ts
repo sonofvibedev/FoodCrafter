@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useStore } from './store'
 import type { Dish, Ingredient } from './types'
 import { dailyMacros } from './lib/calc'
@@ -26,4 +26,21 @@ export function usePrefersReducedMotion(): boolean {
       window.matchMedia('(prefers-reduced-motion: reduce)').matches,
     [],
   )
+}
+
+/** Реагирует на media query: нужен для вертикального таб-бара на десктопе. */
+export function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia(query).matches,
+  )
+
+  useEffect(() => {
+    const media = window.matchMedia(query)
+    const apply = () => setMatches(media.matches)
+    apply()
+    media.addEventListener('change', apply)
+    return () => media.removeEventListener('change', apply)
+  }, [query])
+
+  return matches
 }

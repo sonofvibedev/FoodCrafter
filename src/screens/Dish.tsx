@@ -5,7 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import BottomSheet from '../components/BottomSheet'
 import ConfirmDialog from '../components/ConfirmDialog'
 import IconButton from '../components/IconButton'
-import { categoryEmoji, macroLine } from '../components/LibraryPicker'
+import { categoryEmoji, macroLine } from '../lib/format'
 import MacroBar from '../components/MacroBar'
 import Photo from '../components/Photo'
 import ProductRow from '../components/ProductRow'
@@ -214,7 +214,7 @@ function AddToPlanSheet({
             key={p}
             type="button"
             onClick={() => put(addMeal(date, p))}
-            className="rounded-tile border border-dashed border-line px-4 py-3 text-left text-[17px] font-semibold text-ink2"
+            className="rounded-tile border-[1.5px] border-dashed border-[var(--add-border)] bg-[var(--add-bg)] px-4 py-3 text-left text-[17px] font-semibold text-[var(--add-text)]"
           >
             + {p}
           </button>

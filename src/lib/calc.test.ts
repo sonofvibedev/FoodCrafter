@@ -105,6 +105,7 @@ describe('норма калорий', () => {
     goal: 'keep',
     macroSplit: { protein: 30, fat: 30, carbs: 40 },
     theme: 'system',
+    palette: '1',
   }
 
   it('Миффлин—Сан Жеор для мужчины', () => {
