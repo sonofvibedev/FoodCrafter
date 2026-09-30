@@ -1,16 +1,18 @@
-import { motion } from 'framer-motion'
-import { Apple, CircleUserRound, ShoppingBasket, UtensilsCrossed } from 'lucide-react'
+import { motion, useTransform } from 'framer-motion'
 import { NavLink, useLocation } from 'react-router-dom'
+import { useMediaQuery } from '../hooks'
+import { TABS, tabIndexOf, tabProgress } from '../tabs'
 
-const TABS = [
-  { to: '/plan', label: 'План', Icon: UtensilsCrossed },
-  { to: '/products', label: 'Продукты', Icon: Apple },
-  { to: '/cart', label: 'Корзина', Icon: ShoppingBasket },
-  { to: '/profile', label: 'Профиль', Icon: CircleUserRound },
-]
+/** Шаг индикатора: кнопка 70px + промежуток 4px. */
+const STEP = 74
 
 export default function TabBar() {
   const { pathname } = useLocation()
+  const active = tabIndexOf(pathname)
+  const vertical = useMediaQuery('(min-width: 1024px)')
+
+  const offset = useTransform(tabProgress, (p) => p * STEP)
+  const zero = useTransform(tabProgress, () => 0)
 
   return (
     <nav
@@ -23,34 +25,33 @@ export default function TabBar() {
     >
       <ul
         className="
-          pointer-events-auto flex items-center gap-1 rounded-[100px] bg-tabbar px-2 py-1
+          pointer-events-auto relative flex items-center gap-1 rounded-[100px] bg-tabbar px-2 py-1
           shadow-[0_8px_28px_rgba(0,0,0,0.22)]
           lg:flex-col lg:gap-2 lg:px-1 lg:py-2
         "
       >
-        {TABS.map(({ to, label, Icon }) => {
-          const active = pathname.startsWith(to)
+        <motion.span
+          aria-hidden
+          style={{ x: vertical ? zero : offset, y: vertical ? offset : zero }}
+          className="absolute top-1 left-2 size-[70px] rounded-full bg-accent lg:top-2 lg:left-1"
+        />
+        {TABS.map(({ to, label, Icon }, i) => {
+          const isActive = i === active
           return (
             <li key={to}>
               <NavLink
                 to={to}
                 aria-label={label}
-                aria-current={active ? 'page' : undefined}
+                aria-current={isActive ? 'page' : undefined}
                 className="relative grid size-[70px] place-items-center rounded-full"
               >
-                {active ? (
-                  <motion.span
-                    layoutId="tab-indicator"
-                    className="absolute inset-0 rounded-full bg-accent"
-                    transition={{ type: 'spring', stiffness: 460, damping: 36 }}
-                  />
-                ) : (
+                {!isActive && (
                   <span className="absolute inset-0 rounded-full bg-[var(--fc-tabbar-item)]" />
                 )}
                 <Icon
                   className="relative size-7"
-                  strokeWidth={active ? 2.4 : 2}
-                  color={active ? '#fff' : 'rgba(255,255,255,0.72)'}
+                  strokeWidth={isActive ? 2.4 : 2}
+                  color={isActive ? 'var(--accent-contrast)' : 'rgba(255,255,255,0.72)'}
                   aria-hidden
                 />
               </NavLink>
